@@ -49,10 +49,12 @@ const bodyParser = require('body-parser')
 const session = require('express-session')
 const flash = require('connect-flash')
 
-const localStrategy = 
+app.locals.title = "CCNS Token"
 
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(flash())
+app.use('/public', express.static(__dirname + '/public'));
 app.use(session({
   saveUninitialized: false,
   resave: true,
@@ -67,23 +69,21 @@ Passport.serializeUser(function(user, done){
 })
 
 Passport.deserializeUser(function(uuid, done){
-  users = _.where(web3.parity.accountsInfo, {uuid: uuid})
-  done(null, users[0])
+  user = getUserByUUID(uuid)
+  done(null, user)
 })
 
-Passport.use(new LocalStrategy({
+Passport.use('local', new LocalStrategy({
     usernameField: 'username',
     passwordField: 'password',
   },
   function(username, password, done) {
-    users = _.where(web3.parity.accountsInfo, {name: username})
-    user = users[0]
-    user.meta = JSON.parse(user.meta)
+    user = getUserByName(username)
 
-    if ( !users.length ) {
+    if (!user) {
       return done( null, false, { message: 'Invalid user' } )
     }
-    if(password != user.meta.pw) {
+    if (password != user.meta.pw) {
       return done( null, false, { message: 'Invalid password' } )
     }
 
@@ -92,10 +92,39 @@ Passport.use(new LocalStrategy({
 ))
 
 app.get('/', function (req, res) {
-  res.send('Hello World!')
+  if (req.user) {
+    var name = req.user.name
+    var address = req.user.address
+    var balance = token.balanceOf(address) / 100000
+    res.render('index.ejs', {loggedIn: true, name: name, balance: balance})
+  }
+  else
+    res.redirect('/login')
 })
 
-app.get('/versions', function (req, res) {
+app.get('/login', function (req, res) {
+  var flash = req.flash()
+  if (!req.user)
+    res.render('login.ejs', {loggedIn: false, name: 'Guest', error: flash.error})
+  else
+    res.redirect('/')
+})
+
+app.get('/logout', function (req, res) {
+  req.logout()
+  res.redirect('/login')
+})
+
+app.post('/login',
+  Passport.authenticate('local', {
+    successRedirect: '/',
+    successFlash: 'Welcome',
+    failureRedirect: '/login',
+    failureFlash: 'Invalid username or password'
+  })
+)
+
+app.get('/api/versions', function (req, res) {
   var vapi = web3.version.api
   var vnode = web3.version.node
   var vnetwork = web3.version.network
@@ -108,30 +137,31 @@ app.get('/versions', function (req, res) {
   })
 })
 
-app.post('/unlock', function (req, res) {
+app.get('/api/balance', function (req, res) {
+  var address = req.query.address
+  res.send(token.balanceOf(address))
+})
+
+app.get('/api/accounts', function (req, res) {
+  res.send(web3.parity.accountsInfo)
+})
+
+app.get('/api/genPhrase', function (req, res) {
+  res.send(bip39.generateMnemonic())
+})
+
+app.post('/api/unlock', function (req, res) {
   var password = req.body.password
   var account = req.body.account
   res.send(web3.personal.unlockAccount(account, password))
 })
 
-app.get('/balance', function (req, res) {
-  var account = req.query.account
-  res.send(token.balanceOf(account))
+app.post('/api/tokenBalance', function (req, res) {
+  var address = req.body.address
+  res.send(token.balanceOf(address))
 })
 
-app.get('/accounts', function (req, res) {
-  res.send(web3.parity.accountsInfo)
-})
-
-app.get('/genPhrase', function (req, res) {
-  res.send(bip39.generateMnemonic())
-})
-
-app.get('/login', function (req, res) {
-  res.send(req.flash())
-})
-
-app.post('/send', function (req, res) {
+app.post('/api/send', function (req, res) {
   var fromAddress = req.body.from
   var toAddress = req.body.to
   var password = req.body.password
@@ -139,7 +169,7 @@ app.post('/send', function (req, res) {
 	res.send(token.transfer(toAddress, amount, { from: fromAddress }))
 })
 
-app.post('/pay', function (req, res) {
+app.post('/api/pay', function (req, res) {
   var fromAddress = req.body.from
   var toAddress = tokenOwner
   var password = req.body.password
@@ -147,7 +177,7 @@ app.post('/pay', function (req, res) {
 	res.send(token.transfer(toAddress, amount, { from: fromAddress }))
 })
 
-app.post('/newAccount', function (req, res) {
+app.post('/api/newAccount', function (req, res) {
   var phrase = req.body.phrase
   var password = req.body.password
   var name = req.body.name
@@ -166,15 +196,32 @@ app.post('/newAccount', function (req, res) {
   })
 })
 
-app.post('/login',
-  Passport.authenticate('local', {
-    successRedirect: '/',
-    successFlash: 'Welcome',
-    failureRedirect: '/login',
-    failureFlash: 'Invalid username or password'
-  })
-);
-
 app.listen(3030, function () {
   console.log('Example app listening on port 3030!')
 })
+
+function getUserByName(name) {
+  var accounts = web3.parity.accountsInfo
+  for(var key in accounts) {
+    if (accounts[key].name == name) {
+      var v = accounts[key]
+      v.address = key
+      v.meta = JSON.parse(v.meta)
+      return v
+    }
+  }
+  return 0
+}
+
+function getUserByUUID(uuid) {
+  var accounts = web3.parity.accountsInfo
+  for(var key in accounts) {
+    if (accounts[key].uuid == uuid) {
+      var v = accounts[key]
+      v.address = key
+      v.meta = JSON.parse(v.meta)
+      return v
+    }
+  }
+  return 0
+}

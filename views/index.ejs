@@ -1,0 +1,17 @@
+<% include header %>
+
+<main role="main">
+  <div class="container">
+    <h1>Your balance: <span><%= balance %></span></h1>
+    <form>
+      <h3>CCNS Pay</h3>
+      <div class="form-group">
+        <label for="username">Amount</label>
+        <input class="form-control" name="amount" id="amount" placeholder="Enter amount">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</main>
+
+<% include footer %>

@@ -1,0 +1,24 @@
+<% include header %>
+
+<main role="main">
+  <div class="container">
+    <form action="/login" method="post">
+	  	<% if (error) { %>
+	  		<div class="alert alert-danger" role="alert">
+				  <%= error %>
+				</div>
+	  	<% } %>
+		  <div class="form-group">
+		    <label for="username">Username</label>
+		    <input class="form-control" name="username" id="username" placeholder="Enter username">
+		  </div>
+		  <div class="form-group">
+		    <label for="password">Password</label>
+		    <input class="form-control" name="password" id="password" placeholder="Password" type="password">
+		  </div>
+		  <button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+  </div>
+</main>
+
+<% include footer %>
