@@ -2,6 +2,11 @@
 
 <main role="main">
   <div class="container" id="main-container">
+    <% if (message) { %>
+      <div class="alert alert-success" role="alert">
+        <%= message %>
+      </div>
+    <% } %>
     <h1>Your balance: <span><%= balance %></span></h1>
     <% include pay_form %>
   </div>

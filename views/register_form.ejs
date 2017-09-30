@@ -1,0 +1,75 @@
+<form id="register-form" onkeypress="return event.keyCode != 13;">
+  <div class="form-group">
+    <label for="username">Username</label>
+    <input class="form-control" name="username" id="username" placeholder="Enter username">
+    <label for="username">Password</label>
+    <input class="form-control" name="password" id="password" type="password" placeholder="Enter password">
+    <label for="username">Card UID</label>
+    <input class="form-control" name="uid" id="uid" type="password" placeholder="Enter card uid">
+    <label for="username">Restore phrase</label> <strong id="phrase-warning" style="display: none">Please write down your restore phrase immediately!</strong>
+    <div class="input-group">
+      <span class="input-group-btn">
+        <button class="btn btn-info" type="button" id="generate-phrase">Gen!</button>
+      </span>
+      <input type="text" class="form-control" placeholder="Click Gen!" id="phrase" readonly>
+    </div>
+  </div>
+  <button class="btn btn-primary" id="submit" type="submit" disabled>Submit!</button>
+</form>
+
+<script>
+$("#generate-phrase").click(function(event) {
+  event.preventDefault()
+  $.ajax({
+    url: "/api/genPhrase",
+    method: "GET"
+  }).done(function(result) {
+    $("#phrase").val(result)
+    $("#phrase-warning").show()
+    checkFill()
+  })
+})
+
+$("#register-form").submit(function(event) {
+  event.preventDefault()
+  var phrase = $(this).find("#phrase").val()
+  var username = $(this).find("#username").val()
+  var uid = $(this).find("#uid").val()
+  var password = $(this).find("#password").val()
+  
+  $.ajax({
+    url: "/api/newAccount",
+    method: "POST",
+    data: {
+      phrase: phrase,
+      name: username,
+      password: uid,
+      pw: password
+    }
+  }).done(function(result) {
+    if(!result.code) {
+      window.location.href = "/login?msg=Registered successfully!";
+    }
+    else {
+      console.lot(result.msg)
+    }
+  })
+})
+
+$('#register-form input').keyup(checkFill);
+
+function checkFill() {
+  var empty = false;
+  $('#register-form input').each(function() {
+    if ($(this).val().length == 0) {
+      empty = true;
+    }
+  });
+
+  if (empty) {
+    $('#submit').attr('disabled', 'disabled');
+  } else {
+    $('#submit').removeAttr('disabled');
+  }
+}
+</script>

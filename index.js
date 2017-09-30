@@ -93,10 +93,11 @@ Passport.use('local', new LocalStrategy({
 
 app.get('/', function (req, res) {
   if (req.user) {
+    var message = req.query.msg
     var name = req.user.name
     var address = req.user.address
     var balance = token.balanceOf(address) / 100000
-    res.render('index.ejs', {loggedIn: true, name: name, balance: balance, address: address})
+    res.render('index.ejs', {loggedIn: true, name: name, balance: balance, address: address, message: message})
   }
   else
     res.redirect('/login')
@@ -106,7 +107,6 @@ app.get('/pay', function (req, res) {
   if (req.user) {
     var txAddr = req.query.tx
     var error = req.query.err
-    console.log(error)
     var name = req.user.name
     var address = req.user.address
     var balance = token.balanceOf(address) / 100000
@@ -127,6 +127,14 @@ app.get('/login', function (req, res) {
 app.get('/logout', function (req, res) {
   req.logout()
   res.redirect('/login')
+})
+
+app.get('/register', function (req, res) {
+  var flash = req.flash()
+  if (!req.user)
+    res.render('register.ejs', {loggedIn: false, name: 'Guest'})
+  else
+    res.redirect('/')
 })
 
 app.post('/login',
@@ -179,7 +187,12 @@ app.post('/api/send', function (req, res) {
   var fromAddress = req.body.from
   var toAddress = req.body.to
   var amount = parseInt(req.body.amount) * 100000
-	res.send(token.transfer(toAddress, amount, { from: fromAddress }))
+  token.transfer(toAddress, amount, { from: fromAddress }, (err, result) => {
+    if(!err)
+      res.send(result)
+    else
+      res.send(err)
+  })
 })
 
 // TODO: Handle timeout and reject.
@@ -201,16 +214,16 @@ app.post('/api/newAccount', function (req, res) {
   var name = req.body.name
   var pw = req.body.pw
   if(_.where(web3.parity.accountsInfo, {name: name}).length)
-    return res.send("Duplicated name.")
+    return res.send({code: -1, msg: "Duplicate username!"})
   var address = web3.parity.newAccountFromPhrase(phrase, password)
   web3.parity.setAccountName(address, name)
   web3.parity.setAccountMeta(address, JSON.stringify({pw: pw}))
   request("http://faucet.ropsten.be:3001/donate/"+address, 
   (err, response, body) => { 
     if(!err)
-      res.send(body)
+      res.send({code: 0})
     else
-      res.send(err)
+      res.send({code: -2, msg: "Failed to request faucet!"})
   })
 })
 
