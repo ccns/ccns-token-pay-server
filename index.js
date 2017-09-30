@@ -96,7 +96,21 @@ app.get('/', function (req, res) {
     var name = req.user.name
     var address = req.user.address
     var balance = token.balanceOf(address) / 100000
-    res.render('index.ejs', {loggedIn: true, name: name, balance: balance})
+    res.render('index.ejs', {loggedIn: true, name: name, balance: balance, address: address})
+  }
+  else
+    res.redirect('/login')
+})
+
+app.get('/pay', function (req, res) {
+  if (req.user) {
+    var txAddr = req.query.tx
+    var error = req.query.err
+    console.log(error)
+    var name = req.user.name
+    var address = req.user.address
+    var balance = token.balanceOf(address) / 100000
+    res.render('pay.ejs', {loggedIn: true, name: name, balance: balance, address: address, error: error, txAddr: txAddr})
   }
   else
     res.redirect('/login')
@@ -164,17 +178,21 @@ app.post('/api/tokenBalance', function (req, res) {
 app.post('/api/send', function (req, res) {
   var fromAddress = req.body.from
   var toAddress = req.body.to
-  var password = req.body.password
   var amount = parseInt(req.body.amount) * 100000
 	res.send(token.transfer(toAddress, amount, { from: fromAddress }))
 })
 
+// TODO: Handle timeout and reject.
 app.post('/api/pay', function (req, res) {
   var fromAddress = req.body.from
   var toAddress = tokenOwner
-  var password = req.body.password
   var amount = parseInt(req.body.amount) * 100000
-	res.send(token.transfer(toAddress, amount, { from: fromAddress }))
+  token.transfer(toAddress, amount, { from: fromAddress }, (err, result) => {
+    if(!err)
+      res.send(result)
+    else
+      res.send(err)
+  })
 })
 
 app.post('/api/newAccount', function (req, res) {

@@ -1,0 +1,22 @@
+<% include header %>
+
+<main role="main">
+  <div class="container" id="main-container">
+    <h1>Your balance: <span><%= balance %></span></h1>
+
+    <% if (error) { %>
+      <div class="alert alert-danger" role="alert">
+        <%= error %>
+      </div>
+    <% } %>
+    <% if (txAddr) { %>
+      <div class="alert alert-success" role="alert">
+        <strong>Success!</strong> Tx Address: <%= txAddr %>
+      </div>
+    <% } %>
+
+    <% include pay_form %>
+  </div>
+</main>
+
+<% include footer %>
