@@ -32,11 +32,11 @@ npm start
 
 ## API Reference
 
-- [api/versions](#api/versions)
+- [versions](#versions)
 
 ### Usage
 
-#### api/versions
+#### versions
 
 Returns version information of all related app.
 
