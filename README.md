@@ -38,6 +38,8 @@ npm start
 
 #### api/versions
 
+Returns version information of all related app.
+
 `GET` api/versions
 
 - Data Params
