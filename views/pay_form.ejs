@@ -3,16 +3,21 @@
   <div class="form-group">
     <label for="username">Amount</label>
     <input class="form-control" name="address" id="address" type="hidden" value="<%= address %>">
-    <input class="form-control" name="amount" id="amount" type="number" value="1" placeholder="Enter amount">
+    <input class="form-control" name="amount" id="amount" type="number" value="20" placeholder="Enter amount">
   </div>
   <button class="btn btn-primary" id="pay" type="submit">Pay!</button>
 </form>
 
 <script>
+if (getCookie("amount")) {
+  $("#amount").val(getCookie("amount"))
+}
+
 $("#pay-form").submit(function( event ) {
   event.preventDefault()
   var address = $(this).find("#address").val()
   var amount = $(this).find("#amount").val()
+  setCookie("amount", amount)
   var alert = $.parseHTML('<div class="alert alert-info alert-dismissible fade show" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Please check parity ui!</strong></div>')
   $("#pay-form").prepend(alert)
   $.ajax({
