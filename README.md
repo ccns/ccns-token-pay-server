@@ -17,7 +17,7 @@ git clone https://github.com/ccns/ccns-token-pay-server
 
 #### Edit Parity config file
 
-Edit `misc/config-sample.toml` and save to `%AppData%\Parity\Ethereum\config.toml`
+Edit `misc/config-sample.toml` and save it to `%AppData%\Parity\Ethereum\config.toml`
 
 The sample config file is setup for ropsten testnet. Create your own config by [Parity Config Generator](https://paritytech.github.io/parity-config-generator/) and see [Configuring Parity](https://github.com/paritytech/parity/wiki/Configuring-Parity) if you have no idea for the configurations.
 
@@ -29,6 +29,32 @@ If you want to setup your own config file, remeber to turn on `personal` and `pa
 npm install
 npm start
 ```
+
+## API Reference
+
+- [api/versions](#api/versions)
+
+### Usage
+
+#### api/versions
+
+`GET` api/versions
+
+- Data Params
+
+  None
+
+- Return
+  
+  ```json
+  {
+  	"api":"0.20.2",
+  	"node":"Parity//v1.7.2-beta-9f47909-20170918/x86_64-windows-msvc/rustc1.19.0",
+  	"network":"3",
+  	"ethereum":"63"
+  }
+  ```
+
 
 ## TODO
 
