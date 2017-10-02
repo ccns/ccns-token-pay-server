@@ -63,7 +63,7 @@ None
 
 #### balance
 
-Returns version information of all related app.
+Returns the balance of specific address (must be in the Parity wallet list).
 
 `GET` api/balance
 
