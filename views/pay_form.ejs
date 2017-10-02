@@ -14,7 +14,7 @@ $("#pay-form").submit(function( event ) {
   var address = $(this).find("#address").val()
   var amount = $(this).find("#amount").val()
   var alert = $.parseHTML('<div class="alert alert-info alert-dismissible fade show" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Please check parity ui!</strong></div>')
-  $("#main-container").append(alert)
+  $("#pay-form").prepend(alert)
   $.ajax({
     url: "/api/pay",
     method: "POST",
