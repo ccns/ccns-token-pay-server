@@ -42,20 +42,20 @@ Returns version information of all related app.
 
 `GET` api/versions
 
-- Data Params
+##### Params
 
-  None
+None
 
-- Return
+##### Return
   
-  ```json
-  {
-  	"api":"0.20.2",
-  	"node":"Parity//v1.7.2-beta-9f47909-20170918/x86_64-windows-msvc/rustc1.19.0",
-  	"network":"3",
-  	"ethereum":"63"
-  }
-  ```
+```json
+{
+	"api":"0.20.2",
+	"node":"Parity//v1.7.2-beta-9f47909-20170918/x86_64-windows-msvc/rustc1.19.0",
+	"network":"3",
+	"ethereum":"63"
+}
+```
 
 
 ## TODO
