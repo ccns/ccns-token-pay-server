@@ -1,0 +1,20 @@
+# This config should be placed in following path:
+#   %AppData%\Parity\Ethereum\config.toml
+
+[parity]
+# Auto-updates to every release.
+auto_update = "all"
+# Ropsten Test Network
+chain = "ropsten"
+
+[rpc]
+# Only selected APIs will be exposed over this interface.
+apis = ["web3", "eth", "net", "parity", "traces", "rpc", "secretstore", "parity_accounts", "personal"]
+
+[websockets]
+# Only selected APIs will be exposed over this interface.
+apis = ["web3", "eth", "net", "parity", "parity_pubsub", "traces", "rpc", "secretstore", "personal", "parity_accounts"]
+
+[ipc]
+# Only selected APIs will be exposed over this interface.
+apis = ["web3", "eth", "net", "parity", "parity_accounts", "parity_pubsub", "traces", "rpc", "secretstore", "personal"]
