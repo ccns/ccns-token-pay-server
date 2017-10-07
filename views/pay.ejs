@@ -11,7 +11,7 @@
     <% } %>
     <% if (txAddr) { %>
       <div class="alert alert-success" role="alert">
-        <strong>Success!</strong> Tx Address: <%= txAddr %>
+        <strong>Success!</strong> Tx Address: <a href="https://ropsten.etherscan.io/tx/<%= txAddr%>" target="_blank"><%= txAddr %></a>
       </div>
     <% } %>
 
